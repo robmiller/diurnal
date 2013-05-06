@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require_relative '../lib/logger'
+
+include Diurnal
+
+options = { :data_file => File.expand_path("~/.diurnal.db") }
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: diurnal [options] [command]"
+
+  opts.on("-d", "--data-file", "SQLite datafile to use. Defaults to ~/.diurnal.db") do |file|
+    options[:data_file] = file
+  end
+end.parse!
+
+begin
+  logger = Logger.new options[:data_file]
+rescue
+  puts "Database file not valid"
+  exit
+end
+
+case ARGV[0]
+when "log"
+  value = ARGV[1].to_f
+  logger.log value
+  puts logger.get_latest
+end
+
