@@ -4,6 +4,9 @@ include Diurnal
 
 test_db = File.dirname(__FILE__) + "/../test/test.db"
 
+# Zero the file before running our tests
+File.open(test_db, 'w') { |f| f.write("") }
+
 describe Logger do
   before :each do
     @logger = Logger.new(test_db)
