@@ -17,6 +17,10 @@ describe Logger do
       @logger.file.should == test_db
       @logger.db.should be_an_instance_of(SQLite3::Database)
     end
+
+    it "errors on a nonexistent database file" do
+      expect { Logger.new("nonexistent.db") }.to raise_error(ArgumentError)
+    end
   end
 
   describe "#installed" do
