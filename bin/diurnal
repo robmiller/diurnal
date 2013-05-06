@@ -15,6 +15,10 @@ OptionParser.new do |opts|
   end
 end.parse!
 
+unless File.exists? options[:data_file]
+  File.open(options[:data_file], 'w') { |f| f.write("") }
+end
+
 begin
   logger = Logger.new options[:data_file]
 rescue
