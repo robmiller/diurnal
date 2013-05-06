@@ -49,7 +49,7 @@ module Diurnal
         "INSERT INTO log
         (`key`, `value`, `when`)
         VALUES
-        (?, ?, date('now'))
+        (?, ?, date('now', 'localtime'))
         ",
         key,
         value
