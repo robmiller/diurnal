@@ -24,8 +24,9 @@ end
 
 case ARGV[0]
 when "log"
-  value = ARGV[1].to_f
-  logger.log value
-  puts logger.get_latest
+  key = ARGV[1]
+  value = ARGV[2].to_f
+  logger.log key, value
+  puts logger.get_latest key
 end
 

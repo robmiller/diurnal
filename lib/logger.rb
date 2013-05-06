@@ -35,6 +35,7 @@ module Diurnal
       @db.execute(
         "CREATE TABLE log (
           `id` INTEGER PRIMARY KEY,
+          `key` TEXT(50),
           `value` DOUBLE(25),
           `when` TEXT(25)
         );
@@ -43,13 +44,14 @@ module Diurnal
     end
 
     # Adds a new entry to the log
-    def log(value)
+    def log(key, value)
       @db.execute(
         "INSERT INTO log
-        (`value`, `when`)
+        (`key`, `value`, `when`)
         VALUES
-        (?, date('now'))
+        (?, ?, date('now'))
         ",
+        key,
         value
       )
 
@@ -57,23 +59,27 @@ module Diurnal
     end
 
     # Returns the latest value
-    def get_latest
+    def get_latest(key)
       @db.get_first_value(
         "SELECT value
         FROM log
+        WHERE `key` = ?
         ORDER BY `when` DESC
         LIMIT 1
-        "
+        ",
+        key
       ).to_f
     end
 
     # Gets all of the values in the log
-    def get_all
+    def get_all(key)
       @db.execute(
         "SELECT `when`, `value`
         FROM log
+        WHERE `key` = ?
         ORDER BY `when` ASC
-        "
+        ",
+        key
       )
     end
   end

@@ -25,22 +25,22 @@ describe Logger do
   describe "#log" do
     it "logs new entries" do
       latest_id = @logger.latest_id
-      @logger.log 15.5
+      @logger.log "test", 15.5
       @logger.latest_id.should_not == latest_id
     end
   end
 
   describe "#get_latest" do
     it "retrieves the latest entry" do
-      @logger.get_latest.should == 15.5
+      @logger.get_latest("test").should == 15.5
     end
   end
 
   describe "#get_all" do
     it "retrieves all entries" do
-      @logger.log 20
-      @logger.log 25.5
-      all = @logger.get_all
+      @logger.log "test", 20
+      @logger.log "test", 25.5
+      all = @logger.get_all "test"
       all.should include([Date.today.to_s, 15.5])
       all.should include([Date.today.to_s, 20])
       all.should include([Date.today.to_s, 25.5])
