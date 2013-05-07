@@ -58,29 +58,39 @@ module Diurnal
       @latest_id = @db.last_insert_row_id
     end
 
-    # Returns the latest value
-    def get_latest(key)
-      @db.get_first_value(
-        "SELECT value
-        FROM log
-        WHERE `key` = ?
-        ORDER BY `when` DESC
-        LIMIT 1
-        ",
-        key
-      ).to_f
+    # Fetches entries from the log.
+    #
+    # Pass a block if you'd like to modify the query before it's
+    # executed; that way, you don't have to use a load of boilerplate
+    # SQL
+    def select(key)
+      sql = {
+        :select => "SELECT `when`, `value`",
+        :from   => "FROM log",
+        :join   => "",
+        :where  => "WHERE `key` = :key",
+        :order  => "ORDER BY `when` DESC",
+        :limit  => "",
+        :params => { "key" => key }
+      }
+
+      sql = yield(sql) if block_given?
+
+      params = sql.delete(:params)
+
+      query = sql.values.join("\n")
+
+      @db.execute query, params
     end
 
-    # Gets all of the values in the log
+    # Returns the latest value for the given key
+    def get_latest(key)
+      select(key) { |sql| sql[:limit] = "LIMIT 1"; sql }.first[1]
+    end
+
+    # Gets all of the values in the log for the given key
     def get_all(key)
-      @db.execute(
-        "SELECT `when`, `value`
-        FROM log
-        WHERE `key` = ?
-        ORDER BY `when` ASC
-        ",
-        key
-      )
+      select(key)
     end
   end
 end
