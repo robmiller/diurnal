@@ -92,5 +92,10 @@ module Diurnal
     def get_all(key)
       select(key)
     end
+
+    # Calculates the average value for the given key
+    def average(key)
+      select(key) { |sql| sql[:select] = "SELECT AVG(`value`)"; sql }.first[0]
+    end
   end
 end
