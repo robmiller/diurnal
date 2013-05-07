@@ -74,7 +74,7 @@ module Diurnal
         :params => { "key" => key }
       }
 
-      sql = yield(sql) if block_given?
+      sql = sql.merge yield if block_given?
 
       params = sql.delete(:params)
 
@@ -85,7 +85,7 @@ module Diurnal
 
     # Returns the latest value for the given key
     def get_latest(key)
-      select(key) { |sql| sql[:limit] = "LIMIT 1"; sql }.first[1]
+      select(key) { { :limit => "LIMIT 1" } }.first[1]
     end
 
     # Gets all of the values in the log for the given key
@@ -95,7 +95,7 @@ module Diurnal
 
     # Calculates the average value for the given key
     def average(key)
-      select(key) { |sql| sql[:select] = "SELECT AVG(`value`)"; sql }.first[0]
+      select(key) { { :select => "SELECT AVG(`value`)" } }.first[0]
     end
   end
 end
