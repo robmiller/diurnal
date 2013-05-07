@@ -37,5 +37,8 @@ when "all"
   logger.get_all(key).each do |day|
     puts "#{day[0]}\t#{day[1]}"
   end
+when "average"
+  key = ARGV[1]
+  puts logger.average(key)
 end
 
