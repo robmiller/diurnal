@@ -44,15 +44,18 @@ module Diurnal
     end
 
     # Adds a new entry to the log
-    def log(key, value)
+    def log(key, value, date = false)
+      date ||= Date.today.to_s
+
       @db.execute(
         "INSERT INTO log
         (`key`, `value`, `when`)
         VALUES
-        (?, ?, date('now', 'localtime'))
+        (?, ?, ?)
         ",
         key,
-        value
+        value,
+        date
       )
 
       @latest_id = @db.last_insert_row_id
@@ -63,7 +66,7 @@ module Diurnal
     # Pass a block if you'd like to modify the query before it's
     # executed; that way, you don't have to use a load of boilerplate
     # SQL
-    def select(key)
+    def select(key, since = false)
       sql = {
         :select => "SELECT `when`, `value`",
         :from   => "FROM log",
@@ -73,6 +76,11 @@ module Diurnal
         :limit  => "",
         :params => { "key" => key }
       }
+
+      if since
+        sql[:where] += " AND `when` >= :since"
+        sql[:params]["since"] = since
+      end
 
       sql = sql.merge yield if block_given?
 
@@ -89,13 +97,13 @@ module Diurnal
     end
 
     # Gets all of the values in the log for the given key
-    def get_all(key)
+    def get_all(key, since = false)
       select(key)
     end
 
     # Calculates the average value for the given key
-    def average(key)
-      select(key) { { :select => "SELECT AVG(`value`)" } }.first[0]
+    def average(key, since = false)
+      select(key, since) { { :select => "SELECT AVG(`value`)" } }.first[0]
     end
   end
 end
